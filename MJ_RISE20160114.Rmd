@@ -1,5 +1,5 @@
 ---
-title: "Maya Jose RISE Research Spring 2016"
+title: "Maya Jones RISE Research Spring 2016"
 output: html_document
 ---
 
@@ -17,6 +17,33 @@ See http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE2627
 gset <- getGEO("GSE2627", GSEMatrix =TRUE)
 if (length(gset) > 1) idx <- grep("GPL2022", attr(gset, "names")) else idx <- 1
 gset <- gset[[idx]]
+
+# make proper column names to match toptable 
+fvarLabels(gset) <- make.names(fvarLabels(gset))
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Study the structure of gset and its meta-data
+```{r, comment=NA}
+gset@phenoData@varMetadata
+experimental_design = gset@phenoData@data
+experimental_design[, "source_name_ch1"]
+# experimental_design[1:10,  c("characteristics_ch1", "characteristics_ch1.2")]
+# unique( experimental_design$characteristics_ch1 )
+```
+
+Do a histogram of the expression data
+```{r}
+ex <- exprs(gset)
+mat = matrix( seq(1,length(ex[1,])), nrow=length(ex[1,])/2, ncol= 2 ); 
+layout(mat);
+for(i in 1:length(ex[1,]) ) { 
+  hist(ex[,i], main=experimental_design$source_name_ch1[i]) 
+}
+layout(1)
+boxplot(ex)
+```
+All the expression data are centered around zero? No need for log2 transformation. 
+
+
+
