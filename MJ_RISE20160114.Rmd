@@ -1,17 +1,22 @@
 ---
-title: "MJ-RISE20160114"
+title: "Maya Jose RISE Research Spring 2016"
 output: html_document
 ---
 
-
-```{r}
-summary(cars)
+Load libraries
+```{r, comment=NA, message=FALSE}
+library(Biobase)
+library(GEOquery)
+library(limma)
 ```
 
-You can also embed plots, for example:
+Retrive gene expression data from NCBI GEO database. 
+See http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE2627
 
-```{r, echo=FALSE}
-plot(cars)
+```{r, comment=NA}
+gset <- getGEO("GSE2627", GSEMatrix =TRUE)
+if (length(gset) > 1) idx <- grep("GPL2022", attr(gset, "names")) else idx <- 1
+gset <- gset[[idx]]
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
