@@ -1,7 +1,13 @@
 ---
-title: "Maya Jones RISE Research Spring 2016"
+title: "Maya Jones RISE Research Spring 2016, Paclitaxel-resistence in ovarian cancer cell lines"
 output: html_document
 ---
+Data are from http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE2627
+
+Paclitazel:  https://en.wikipedia.org/wiki/Paclitaxel
+
+The reference paper is at http://www.ncbi.nlm.nih.gov/pubmed/18068629
+
 
 Load libraries
 ```{r, comment=NA, message=FALSE}
@@ -11,7 +17,6 @@ library(limma)
 ```
 
 Retrive gene expression data from NCBI GEO database. 
-See http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE2627
 
 ```{r, comment=NA}
 gset <- getGEO("GSE2627", GSEMatrix =TRUE)
@@ -25,8 +30,9 @@ fvarLabels(gset) <- make.names(fvarLabels(gset))
 
 Study the structure of gset and its meta-data
 ```{r, comment=NA}
-gset@phenoData@varMetadata
+# gset@phenoData@varMetadata  #this is empty
 experimental_design = gset@phenoData@data
+experimental_design
 experimental_design[, "source_name_ch1"]
 # experimental_design[1:10,  c("characteristics_ch1", "characteristics_ch1.2")]
 # unique( experimental_design$characteristics_ch1 )
@@ -45,5 +51,10 @@ boxplot(ex)
 ```
 All the expression data are centered around zero? No need for log2 transformation. 
 
+According to GSE2627 summary. These data are log2 transformed expression ratios and are normalized by scaled loess normalization. 
+```{r}
+apply(ex, 2, mean)
+apply(ex, 2, median)
+```
 
 
