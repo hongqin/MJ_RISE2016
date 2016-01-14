@@ -8,6 +8,10 @@ Paclitazel:  https://en.wikipedia.org/wiki/Paclitaxel
 
 The reference paper is at http://www.ncbi.nlm.nih.gov/pubmed/18068629
 
+Cy3 and Cy5
+https://en.wikipedia.org/wiki/Cyanine
+Cy3 fluoresces greenish yellow (~550 nm excitation, ~570 nm emission), while Cy5 is fluorescent in the red region (~650 excitation, 670 nm emission)
+
 
 Load libraries
 ```{r, comment=NA, message=FALSE}
