@@ -2,7 +2,8 @@
 title: "Maya Jones RISE Research Spring 2016, Paclitaxel-resistence in ovarian cancer cell lines"
 output: html_document
 ---
-Data are from http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE2627
+Data are from http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE2627. 
+"Data was transformed into log base 2 expression ratios and normalized using scaled loess normalization.""
 
 Paclitazel:  https://en.wikipedia.org/wiki/Paclitaxel
 
@@ -11,7 +12,6 @@ The reference paper is at http://www.ncbi.nlm.nih.gov/pubmed/18068629
 Cy3 and Cy5
 https://en.wikipedia.org/wiki/Cyanine
 Cy3 fluoresces greenish yellow (~550 nm excitation, ~570 nm emission), while Cy5 is fluorescent in the red region (~650 excitation, 670 nm emission)
-
 
 Load libraries
 ```{r, comment=NA, message=FALSE}
@@ -23,13 +23,14 @@ library(limma)
 Retrive gene expression data from NCBI GEO database. 
 
 ```{r, comment=NA}
-gset <- getGEO("GSE2627", GSEMatrix =TRUE)
+#gset <- getGEO("GSE2627", GSEMatrix =TRUE)
+#save.image("GSE2627.RData")
+load("GSE2627.RData")
 if (length(gset) > 1) idx <- grep("GPL2022", attr(gset, "names")) else idx <- 1
 gset <- gset[[idx]]
-
+str(gset)
 # make proper column names to match toptable 
 fvarLabels(gset) <- make.names(fvarLabels(gset))
-
 ```
 
 Study the structure of gset and its meta-data
@@ -45,12 +46,14 @@ experimental_design[, "source_name_ch1"]
 Do a histogram of the expression data
 ```{r}
 ex <- exprs(gset)
-mat = matrix( seq(1,length(ex[1,])), nrow=length(ex[1,])/2, ncol= 2 ); 
-layout(mat);
+# mat = matrix( seq(1,length(ex[1,])), nrow=length(ex[1,])/2, ncol= 2 ); 
+# layout(mat);
+par(mfrow=c(2,2))
 for(i in 1:length(ex[1,]) ) { 
   hist(ex[,i], main=experimental_design$source_name_ch1[i]) 
 }
-layout(1)
+# layout(1)
+par(mfrow=c(1,1))
 boxplot(ex)
 ```
 All the expression data are centered around zero? No need for log2 transformation. 
@@ -60,5 +63,36 @@ According to GSE2627 summary. These data are log2 transformed expression ratios 
 apply(ex, 2, mean)
 apply(ex, 2, median)
 ```
+
+
+Set up the data and proceed with analysis. Modified by GEO sample script. 
+```{r, comment=NA}
+gset@phenoData@data[,  c("source_name_ch1")]
+gset@phenoData@data$source_name_ch1
+treatments <- make.names(gset@phenoData@data$source_name_ch1)
+fl.names = unique(treatments)
+fl = as.factor( LETTERS[1:length(fl.names)]) 
+names(fl) = fl.names
+gset$description <- fl
+design <- model.matrix(~ description + 0, gset)
+colnames(design) <- levels(fl)
+fit <- lmFit(gset, design)
+cont.matrix <- makeContrasts( A-B, levels=fl)
+fit2 <- contrasts.fit(fit, cont.matrix)
+fit2 <- eBayes(fit2, 0.01)
+tT <- topTable(fit2, adjust="fdr", sort.by="B", number=length(fit2))
+```
+
+```{r, comment=NA}
+str(fit)
+str(fit2)
+str(tT)
+```
+
+Vocalno plot
+```{r, comment=NA}
+
+```
+
 
 
