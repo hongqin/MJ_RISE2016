@@ -10,6 +10,8 @@ GEO Data: http://www.ncbi.nlm.nih.gov/geo/geo2r/?acc=GSE47856
 Use limma package for differnetial expression analysis. 
 ```{r message=FALSE}
 #   Differential expression analysis with limma
+rm(list=ls())
+setwd("~/github/MJ_RISE2016/project2.GSE47856")
 library(Biobase)
 library(GEOquery)
 library(limma)
