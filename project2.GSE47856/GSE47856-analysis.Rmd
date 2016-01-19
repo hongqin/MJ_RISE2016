@@ -1,12 +1,16 @@
 ---
 title: "Ovarian cancer, Cisplatin"
 author: "H Qin"
-date: "January 11, 2016"
+date: "January 19, 2016"
 output: html_document
 ---
 
 Analysis of ovarian cancer under treatment of cisplatin
-GEO Data: http://www.ncbi.nlm.nih.gov/geo/geo2r/?acc=GSE47856 
+
+GEO Data:
+http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE47856
+http://www.ncbi.nlm.nih.gov/geo/geo2r/?acc=GSE47856 
+
 Use limma package for differnetial expression analysis. 
 ```{r message=FALSE}
 #   Differential expression analysis with limma
@@ -78,7 +82,6 @@ medians = apply(ex, 2, median)
 medians
 means = apply(ex, 2, mean)
 means
-
 ```
 
 
@@ -88,23 +91,49 @@ gset@phenoData@data[,  c("characteristics_ch1", "characteristics_ch1.2")]
 gset@phenoData@data$characteristics_ch1.2
 treatments <- make.names(gset@phenoData@data$characteristics_ch1.2)
 fl.names = unique(treatments)
+fl.names
 fl = as.factor( LETTERS[1:length(fl.names)]) 
 names(fl) = fl.names
-gset$description <- fl
+fl
+
+#convert treatment into letters
+treatments2 = fl[treatments] 
+gset$description <- treatments2
 design <- model.matrix(~ description + 0, gset)
+design
 colnames(design) <- levels(fl)
 fit <- lmFit(gset, design)
 cont.matrix <- makeContrasts( A-B, levels=fl)
+cont.matrix
 fit2 <- contrasts.fit(fit, cont.matrix)
 fit2 <- eBayes(fit2, 0.01)
 tT <- topTable(fit2, adjust="fdr", sort.by="B", number=50)
-tT <- topTable(fit2, adjust="fdr", sort.by="B", number=length(fit2))
+tTall <- topTable(fit2, adjust="fdr", sort.by="B", number=length(fit2))
 ```
-
 
 ```{r}
 str(fit)
 str(fit2)
 str(tT)
 ```
+
+Get the GPL annotation
+```{r}
+gpl <- annotation(gset)
+platf <- getGEO(gpl, AnnotGPL=TRUE)
+ncbifd <- data.frame(attr(dataTable(platf), "table"))
+```
+
+What does "ID" means in GPL? See GPL manual at
+http://www.ncbi.nlm.nih.gov/geo/info/platform.html
+
+```{r, comment=NA}
+tT[tT$ID ==7914270 , ]
+ncbifd[ ncbifd$ID == 7914270, ]
+```
+Does topTable summarize all probesets for each gene? 
+No, topTable appears to report by "ID" for each probe. 
+
+TODO: 
+
 
