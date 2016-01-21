@@ -1,7 +1,7 @@
 ---
 title: "Ovarian cancer, Cisplatin"
 author: "H Qin"
-date: "January 19, 2016"
+date: "January 21, 2016"
 output: html_document
 ---
 
@@ -53,7 +53,9 @@ sel = grep("HeyC2", experimental_design$characteristics_ch1)
 gset = gset[ ,sel]
 ```
 
-Do a histogram of the expression data
+Do a histogram of the expression data. 
+Qin: Look like data have been log-transformed. Needs to double check this. 
+MJ: check the meaning of box plots. 
 ```{r}
 ex <- exprs(gset)
 hist(ex[,1])
@@ -98,6 +100,7 @@ fl
 
 #convert treatment into letters
 treatments2 = fl[treatments] 
+treatments2
 gset$description <- treatments2
 design <- model.matrix(~ description + 0, gset)
 design
@@ -107,11 +110,16 @@ cont.matrix <- makeContrasts( A-B, levels=fl)
 cont.matrix
 fit2 <- contrasts.fit(fit, cont.matrix)
 fit2 <- eBayes(fit2, 0.01)
-tT <- topTable(fit2, adjust="fdr", sort.by="B", number=50)
+tT <- topTable(fit2, adjust="fdr", sort.by="B", number=250)
 tTall <- topTable(fit2, adjust="fdr", sort.by="B", number=length(fit2))
 ```
+MJ: study what is pvalue and false dicovery rate for adjusting pvalue. 
+
+
+
 
 ```{r}
+
 str(fit)
 str(fit2)
 str(tT)
@@ -130,10 +138,22 @@ http://www.ncbi.nlm.nih.gov/geo/info/platform.html
 ```{r, comment=NA}
 tT[tT$ID ==7914270 , ]
 ncbifd[ ncbifd$ID == 7914270, ]
+tT$Gene.symbol = ncbifd[ match(tT$ID, ncbifd$ID) , "Gene.symbol" ]
+tTall$Gene.symbol = ncbifd[ match(tTall$ID, ncbifd$ID) , "Gene.symbol" ]
 ```
 Does topTable summarize all probesets for each gene? 
 No, topTable appears to report by "ID" for each probe. 
 
+
+Output the two tables
+```{r}
+write.table(tT$Gene.symbol, "select1percent.csv", row.names = FALSE)
+write.table(tTall$Gene.symbol, "all_genes.csv", row.names = FALSE)
+```
+
 TODO: 
+20160121THu, GOrilla analysis. Gene names not recognized. Problem needs more work. 
+
+
 
 
