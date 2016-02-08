@@ -50,7 +50,8 @@ cell_lines = as.character( unique( experimental_design$characteristics_ch1 ) )
 Pick one cell line for test. 
 ```{r}
 # sel = grep("HeyC2", experimental_design$characteristics_ch1)
-sel = grep(cell_lines[5], experimental_design$characteristics_ch1)
+selected_cell_line = cell_lines[5]
+sel = grep(selected_cell_line, experimental_design$characteristics_ch1)
 gset = gset[ ,sel]
 ```
 
@@ -148,8 +149,9 @@ No, topTable appears to report by "ID" for each probe.
 
 Output the two tables. Use 't' to decide up or down-regulation? Need to check 'limma' manual. 
 ```{r}
-write.table(tT$Gene.symbol[tT$t>0], "select1percentUP.csv", row.names = FALSE, quote=F, col.names=F)
-write.table(tT$Gene.symbol[tT$t<0], "select1percentDown.csv", row.names = FALSE, quote=F, col.names=F)
+tag = gsub( "cell line: ", "", selected_cell_line)
+write.table(tT$Gene.symbol[tT$t>0], paste("select1percentUP", tag, "csv", sep='.'), row.names = FALSE, quote=F, col.names=F)
+write.table(tT$Gene.symbol[tT$t<0], paste("select1percentDown", tag, "csv", sep="."), row.names = FALSE, quote=F, col.names=F)
 write.table(tTall$Gene.symbol, "all_genes.csv", row.names = FALSE, quote=F, col.names = F)
 ```
 
