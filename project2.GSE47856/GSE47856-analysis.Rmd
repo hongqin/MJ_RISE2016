@@ -50,7 +50,7 @@ cell_lines = as.character( unique( experimental_design$characteristics_ch1 ) )
 Pick one cell line for test. 
 ```{r}
 # sel = grep("HeyC2", experimental_design$characteristics_ch1)
-selected_cell_line = cell_lines[14] #1,2,3,4,5,6,7,8,9 10,
+selected_cell_line = cell_lines[16] #1,2,3,4,5,6,7,8,9 10,
 sel = grep(selected_cell_line, experimental_design$characteristics_ch1)
 gset = gset[ ,sel]
 ```
